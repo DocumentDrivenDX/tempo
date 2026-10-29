@@ -163,9 +163,9 @@ Stack decisions are recorded in `01-frame/concerns.md`; rationale belongs in ADR
 
 - **Language/Runtime**: TypeScript on Node.js (Azure Functions managed runtime)
 - **Key Libraries**: React with Vite (SPA)
-- **Data/Storage**: Azure SQL Database serverless (leading candidate; ADR required)
+- **Data/Storage**: Azure SQL Database serverless (ADR-002)
 - **Auth**: Microsoft Entra ID, single tenant, via Azure Static Web Apps custom registration
-- **Platform Targets**: Azure Static Web Apps (Standard) with managed Functions; current Chrome, Edge, Firefox, Safari
+- **Platform Targets**: Azure Static Web Apps (Standard) with a linked Azure Functions app (ADR-001); current Chrome, Edge, Firefox, Safari
 
 ## Constraints, Assumptions, Dependencies
 

@@ -11,11 +11,11 @@ ddx:
 
 | Concern | Source | Areas | Why Active | Key Practices | Selection |
 |---------|--------|-------|------------|---------------|-----------|
-| language-runtime: TypeScript on Node.js | assumption | `area:api`, `area:ui` | Azure Functions (managed SWA API) runs Node, not Bun; one language across API and UI. Overrides the shipped `typescript-bun` default. | Strict TS; shared types for API contracts; managed Functions only (no containers) | operator-override |
-| frontend-framework: react-vite | assumption | `area:ui` | SPA served as static content on Azure Static Web Apps; Next.js SSR adds hosting complexity with no stated need. Overrides shipped `react-nextjs` default. | SPA, client-side routing, timer state in-browser | assumption (validate in design) |
-| deploy-target: Azure Static Web Apps + managed Functions | operator-override (cloud = Azure, serverless, low cost) | `area:infra` | Operator chose Azure; SWA Standard supports custom Entra registration and custom roles. | IaC for all resources; scale-to-zero | operator-override |
+| language-runtime: TypeScript on Node.js | assumption | `area:api`, `area:ui` | Azure Functions (managed SWA API) runs Node, not Bun; one language across API and UI. Overrides the shipped `typescript-bun` default. | Strict TS; shared types for API contracts; serverless Functions only (no containers) | operator-override |
+| frontend-framework: react-vite | assumption | `area:ui` | SPA served as static content on Azure Static Web Apps; Next.js SSR adds hosting complexity with no stated need. Overrides shipped `react-nextjs` default. | SPA, client-side routing, timer state in-browser | ADR-003 |
+| deploy-target: Azure Static Web Apps + linked Azure Functions app | operator-override (cloud = Azure, serverless, low cost); refined by ADR-001 | `area:infra` | Operator chose Azure; SWA Standard supports custom Entra registration and custom roles; the linked Functions app allows managed identity. | IaC for all resources; scale-to-zero | operator-override |
 | auth-provider: Microsoft Entra ID (OIDC) | operator-override | `area:api`, `area:data` | Operator requires Entra ID. Overrides shipped `auth-local-sessions`. Project-local filler; no library concern exists. | Single-tenant app registration; Admin/Member as Entra app roles or group claims; no local passwords | operator-override |
-| datastore: Azure SQL Database serverless (free offer) | assumption | `area:data` | Relational data (projects, tasks, time entries, rates, approvals) and aggregate reports; free offer + auto-pause fits low cost. Cosmos DB serverless and PostgreSQL Flexible Server remain alternatives for an ADR. | Migrations in repo; backups verified; tolerate cold-start resume | assumption (ADR required) |
+| datastore: Azure SQL Database serverless (free offer) | ADR-002 | `area:data` | Relational data (projects, tasks, time entries, rates, approvals) and aggregate reports; free offer + auto-pause fits low cost. Cosmos DB serverless and PostgreSQL Flexible Server remain alternatives for an ADR. | Migrations in repo; backups verified; tolerate cold-start resume | decided in ADR-002 |
 | scope-discipline | library | all | Replacing a commercial tool invites feature creep. | Hold v1 to named Everhour-parity features | assumption |
 | security-owasp | library | `area:api`, `area:ui` | Authenticated business data incl. billing rates. | Server-side authorization on every call | assumption |
 | authorization-model | library | `area:api` | Admin, Member, and Accountant roles plus per-project membership, approvals, and period close. | Central policy checks | assumption |
@@ -34,8 +34,8 @@ ddx:
 
 | Concern | Practice | Override | Authority |
 |---------|----------|----------|-----------|
-| language-runtime | typescript-bun default | Node.js runtime on managed Functions (operator wants fully serverless) | Operator instruction; ADR to record |
-| frontend-framework | react-nextjs default | react-vite | Needs ADR |
+| language-runtime | typescript-bun default | Node.js runtime on Azure Functions (operator wants fully serverless) | Operator instruction; ADR-003 |
+| frontend-framework | react-nextjs default | react-vite | ADR-003 |
 | auth-provider | auth-local-sessions default | Entra ID | Operator instruction |
 
 ## Area Labels
