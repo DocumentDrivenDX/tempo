@@ -1,0 +1,16 @@
+# Fails a pull request that leaves the guide behind the repository (see documentor's `check`).
+name: guide
+on:
+  pull_request:
+permissions:
+  contents: read
+env:
+  DOCUMENTOR: "git+https://github.com/DocumentDrivenDX/helix@v0.19.1#subdirectory=tools/documentor"
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+        with: { python-version: "3.12" }
+      - run: uvx --from "$DOCUMENTOR" documentor check --root .

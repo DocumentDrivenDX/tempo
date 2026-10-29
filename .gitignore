@@ -6,3 +6,5 @@ dist/
 
 # Generated schema browser (see docs/helix/02-design/umf/build-browser.mjs)
 docs/helix/02-design/umf/browser/
+.helix/site/
+.hugo_build.lock

@@ -1,3 +1,26 @@
 flows:
   - id: helix
     root: docs/helix/
+
+# documentor: who reads Tempo's documentation and how the site is assembled.
+publish:
+  schema: 1
+  traits: []
+  audiences: [developer, data]
+  delegate:
+    data/tables: {tool: the Schemas section, covers: every table, column, key, and relationship (generated from the UMF table specs), url: ../../schemas/reference/}
+  skip: [developer/walkthrough, developer/developer-guide, data/lineage, data/using, data/metrics]
+  site:
+    title: Tempo
+    description: Time tracking for Synaptiq, designed with HELIX. Vision, requirements, design, and the database schema.
+    repo_url: https://github.com/DocumentDrivenDX/tempo
+    base_url: /tempo/
+    target: hextra
+    record: true
+    sections:
+      - id: schemas
+        title: Schemas
+        reader: The database tables, keys, and relationships, with an interactive schema browser.
+        generated:
+          command: "uv run --no-project --with pyyaml python scripts/guide/build_schema_section.py"
+          out: schemas
