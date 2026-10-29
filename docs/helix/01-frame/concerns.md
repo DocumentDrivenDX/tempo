@@ -19,6 +19,8 @@ ddx:
 | scope-discipline | library | all | Replacing a commercial tool invites feature creep. | Hold v1 to named Everhour-parity features | assumption |
 | security-owasp | library | `area:api`, `area:ui` | Authenticated business data incl. billing rates. | Server-side authorization on every call | assumption |
 | authorization-model | library | `area:api` | Two roles plus per-project membership and approvals. | Central policy checks | assumption |
+| auth | library | `area:api`, `area:ui` | Account-based product: sign-in, sessions, server-side RBAC through the principal (FR-1 to FR-3). Mechanism is the Entra ID filler above. | Resolve principal on every call; no hardcoded provider | assumption (Frame selection) |
+| admin-console | library | `area:ui` | Admins and Managers manage mutable domain objects (users, projects, members, rates, approvals) through the UI. | Primary operator workflow (create project, approve week) covered by whole-stack e2e | assumption (Frame selection) |
 | testing | library | all | Timer logic, rate and budget math, and approvals need a deliberate test strategy. | Unit tests for domain rules; API tests against a real database schema | operator-override |
 | verification | library | all | Evidence-based completion and a pre-merge gate. | Tests and checks pass in CI before merge | operator-override |
 | e2e-playwright (e2e-framework slot) | shipped-default | `area:ui` | Core flows: sign in, timer, timesheet submit, approval. | Playwright against a deployed preview with a test Entra identity | operator-override |
