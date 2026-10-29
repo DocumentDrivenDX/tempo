@@ -13,7 +13,7 @@ ddx:
 **Priority**: P0
 **Owner**: Erik LaBianca
 **Covered PRD Subsystem(s)**: Reports and Export
-**Covered PRD Requirements**: FR-19, FR-20, FR-21
+**Covered PRD Requirements**: FR-19, FR-20, FR-21, FR-26
 **Cross-Subsystem Rationale**: None — single subsystem.
 
 ## Overview
@@ -37,6 +37,7 @@ Staff and managers complete this part of their week without help or workarounds,
 REP-01. Group by project, user, task, or day over a date range (FR-19).
 REP-02. CSV export matches on-screen totals (FR-20).
 REP-03. Rates and amounts visible only to Admins and project Managers (FR-21).
+REP-04. Day and month grouping uses each entry local date by default, with an option to report in one chosen time zone; a time-of-day view shows when people work in their local time (FR-26).
 
 ### Non-Functional Requirements
 
@@ -49,6 +50,7 @@ REP-03. Rates and amounts visible only to Admins and project Managers (FR-21).
 
 - [US-012](../user-stories/US-012.md)
 - [US-013](../user-stories/US-013.md)
+- [US-016](../user-stories/US-016.md)
 
 ## Edge Cases and Error Handling
 
@@ -67,7 +69,7 @@ REP-03. Rates and amounts visible only to Admins and project Managers (FR-21).
 
 - **Other features**: FEAT-001 (identity)
 - **External services**: Entra ID; Azure SQL (exact interface surface lives in Contracts, Design activity)
-- **PRD requirements**: FR-19, FR-20, FR-21
+- **PRD requirements**: FR-19, FR-20, FR-21, FR-26
 
 ## Out of Scope
 

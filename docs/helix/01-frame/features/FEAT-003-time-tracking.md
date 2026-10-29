@@ -13,12 +13,12 @@ ddx:
 **Priority**: P0
 **Owner**: Erik LaBianca
 **Covered PRD Subsystem(s)**: Time Tracking
-**Covered PRD Requirements**: FR-7, FR-8, FR-9, FR-10, FR-11
+**Covered PRD Requirements**: FR-7, FR-8, FR-9, FR-10, FR-11, FR-22, FR-23, FR-24, FR-25
 **Cross-Subsystem Rationale**: None — single subsystem.
 
 ## Overview
 
-Server-held timer, manual entries, editing until approval, and the weekly timesheet view. It implements the PRD subsystem of the same name.
+Server-held timer, manual entries, editing until approval, the week view, time zone capture on every entry, and a configurable week start. It implements the PRD subsystem of the same name.
 
 ## Ideal Future State
 
@@ -37,7 +37,11 @@ Staff and managers complete this part of their week without help or workarounds,
 TIME-01. One running timer per user, held server-side (FR-7, FR-11).
 TIME-02. Manual entries in whole minutes (FR-8).
 TIME-03. Edit and delete own entries until approved (FR-9).
-TIME-04. Weekly timesheet with daily and weekly totals (FR-10).
+TIME-04. A week view with daily and weekly totals as a UI affordance, using the configured week start (FR-10, FR-25).
+TIME-05. Each user has a time zone, defaulted from the browser and changeable (FR-22).
+TIME-06. Every entry records its start instant, IANA time zone, UTC offset, and local date (FR-23).
+TIME-07. Entries crossing local midnight are split at midnight in the entry time zone (FR-24).
+TIME-08. Admins configure the week start; the default is Sunday (FR-25).
 
 ### Non-Functional Requirements
 
@@ -50,11 +54,15 @@ TIME-04. Weekly timesheet with daily and weekly totals (FR-10).
 
 - [US-005](../user-stories/US-005.md)
 - [US-006](../user-stories/US-006.md)
+- [US-014](../user-stories/US-014.md)
+- [US-015](../user-stories/US-015.md)
 
 ## Edge Cases and Error Handling
 
 - Timer left running overnight: user can stop and correct the duration.
 - Entry on an archived project is refused.
+- Daylight-saving change inside an entry: duration is the elapsed time; start and offset are stored.
+- User changes profile time zone: past entries keep their recorded zone.
 
 ## Success Metrics
 
@@ -68,7 +76,7 @@ TIME-04. Weekly timesheet with daily and weekly totals (FR-10).
 
 - **Other features**: FEAT-001 (identity)
 - **External services**: Entra ID; Azure SQL (exact interface surface lives in Contracts, Design activity)
-- **PRD requirements**: FR-7, FR-8, FR-9, FR-10, FR-11
+- **PRD requirements**: FR-7, FR-8, FR-9, FR-10, FR-11, FR-22, FR-23, FR-24, FR-25
 
 ## Out of Scope
 

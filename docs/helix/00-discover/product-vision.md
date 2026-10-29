@@ -25,7 +25,7 @@ Every hour worked is attributed to a project and task in seconds, approved witho
 
 ## User Experience
 
-Priya signs in with her Synaptiq Entra account, opens Tempo, picks a project and task, and presses start. The timer keeps running while she switches tabs; she stops it after the client call and adds a note. Friday she sees a prompt in Teams, opens her week, fills a missed Tuesday entry by hand, and submits the timesheet. Her project manager sees it in an approval queue, approves it, and watches the project's budget bar move from 62% to 68%. At month end an admin exports hours by project and user to CSV.
+Priya signs in with her Synaptiq Entra account, opens Tempo, picks a project and task, and presses start. The timer keeps running while she switches tabs; she stops it after the client call and adds a note. Friday she opens her week, fills a missed Tuesday entry by hand. Her project manager sees her entries in an approval queue, approves them, and watches the project's budget bar move from 62% to 68%. At month end an admin exports hours by project and user to CSV.
 
 ## Target Market
 
@@ -42,9 +42,8 @@ Priya signs in with her Synaptiq Entra account, opens Tempo, picks a project and
 |-------------------|------------------|
 | Timer and manual entry per project and task | Hours get logged in seconds, so reports are accurate |
 | Entra ID sign-in with Admin and Member roles | No new passwords; access follows company directory |
-| Budgets, rates, and timesheet approval | Managers see overruns and approve hours without spreadsheets |
+| Budgets, rates, and entry approval | Managers see overruns and approve hours without spreadsheets |
 | Reports and CSV export | Billing and payroll inputs without re-keying |
-| Teams/Slack reminders | Fewer missing timesheets |
 | Serverless Azure hosting | Hosting cost near zero when idle |
 
 ## Success Definition
@@ -53,9 +52,8 @@ Priya signs in with her Synaptiq Entra account, opens Tempo, picks a project and
 |--------|--------|
 | Primary KPI: hours logged within 24 hours of work | 90% within 3 months of launch |
 | Everhour retired, subscription cancelled | Within 6 months of launch |
-| Historical Everhour data imported | 100% of projects, users, and entries from the last 24 months |
 | Monthly Azure hosting cost at current team size | Under $30 |
-| Timesheets approved within 3 working days of submission | 90% |
+| Entries approved within 3 working days of being logged | 90% |
 
 ## Why Now
 

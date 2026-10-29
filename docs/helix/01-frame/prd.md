@@ -12,7 +12,7 @@ kind: product
 
 ## Summary
 
-Tempo is a web app where Synaptiq staff track time against projects and tasks, project managers set budgets and approve weekly timesheets, and admins report and export hours. It replaces Everhour, signs users in with Entra ID, and runs on serverless Azure for under $30 a month. v1 covers sign-in, projects and tasks, a timer and manual entry, budgets and rates, weekly approval, reports with CSV export, and a one-time Everhour CSV import. Success is 90% of hours logged within 24 hours, Everhour cancelled within 6 months, and approvals within 3 working days.
+Tempo is a web app where Synaptiq staff track time against projects and tasks, project managers set budgets and approve entries, and admins report and export hours. It replaces Everhour, signs users in with Entra ID, and runs on serverless Azure for under $30 a month. v1 covers sign-in, projects and tasks, a timer and manual entry, budgets and rates, weekly approval, and reports with CSV export. Every entry records its time zone so local working hours and month ends are exact. Success is 90% of hours logged within 24 hours, Everhour cancelled within 6 months, and approvals within 3 working days.
 
 ## Problem and Goals
 
@@ -23,7 +23,7 @@ Synaptiq pays Everhour roughly $8.50-$10 per seat per month, manages a second id
 ### Goals
 
 1. Staff log time in seconds, by timer or by hand, against a project and task.
-2. Managers approve hours weekly and see budget burn without spreadsheets.
+2. Managers approve hours entry by entry and see budget burn without spreadsheets.
 3. Synaptiq owns its data and retires Everhour.
 
 ### Success Metrics
@@ -31,8 +31,7 @@ Synaptiq pays Everhour roughly $8.50-$10 per seat per month, manages a second id
 | Metric | Target | Measurement Method |
 |--------|--------|--------------------|
 | Hours logged within 24 hours of work | 90% by 3 months after launch | Entry `created_at` vs entry date, monthly SQL report |
-| Timesheets approved within 3 working days of submission | 90% | Submission and approval timestamps |
-| Everhour history imported | 100% of last 24 months of projects, users, entries | Import dry-run vs commit counts |
+| Entries approved within 3 working days of being logged | 90% | Entry creation and approval timestamps |
 | Monthly Azure cost at current team size | Under $30 | Azure Cost Management |
 | Everhour subscription cancelled | Within 6 months of launch | Finance confirmation |
 
@@ -44,7 +43,7 @@ Synaptiq pays Everhour roughly $8.50-$10 per seat per month, manages a second id
 - Full task management (assignees, due dates, boards, comments); tasks are labels for time.
 - Multi-tenant or external-customer access; Tempo serves one Entra tenant.
 - Native mobile apps; the web app is responsive.
-- Chat reminders (Teams or Slack) and third-party integrations such as Jira, Asana, or GitHub; deferred to `docs/helix/parking-lot.md`.
+- Third-party integrations such as Jira, Asana, or GitHub.
 
 Deferred items tracked in `docs/helix/parking-lot.md`.
 
@@ -53,14 +52,14 @@ Deferred items tracked in `docs/helix/parking-lot.md`.
 ### Primary Persona: Priya, Member
 
 **Role**: Consultant or engineer at Synaptiq working on client projects
-**Goals**: Log hours fast and get her timesheet approved
+**Goals**: Log hours fast and get her hours approved
 **Pain Points**: Forgotten entries, re-keying time, another login
 
 ### Secondary Persona: Marcus, Project Manager
 
 **Role**: Member who is a Manager on one or more projects
 **Goals**: Approve hours, watch budget burn, catch overruns early
-**Pain Points**: Chasing timesheets, building budget reports by hand
+**Pain Points**: Chasing people for hours, building budget reports by hand
 
 ### Secondary Persona: Alex, Admin
 
@@ -76,15 +75,14 @@ Roles: Entra app roles give each user a global role of Admin or Member. Manager 
 
 1. Entra ID sign-in with Admin and Member roles and server-side authorization.
 2. Projects, project membership, and tasks.
-3. Timer and manual time entry with editing.
-4. Weekly timesheet submission, per-project manager approval, and locking.
+3. Timer and manual time entry with editing, with the time zone recorded on every entry.
+4. Per-project manager approval of entries, with locking.
 5. Reports by project, user, and date range, with CSV export.
 
 ### Should Have (P1)
 
 1. Project hour and dollar budgets with consumption display and alert threshold.
 2. Billable rates per user, overridable per project.
-3. Everhour CSV import.
 
 ### Nice to Have (P2)
 
@@ -110,8 +108,12 @@ Roles: Entra app roles give each user a global role of Admin or Member. Manager 
 - **FR-7** — A user starts and stops a timer on a project, optionally on a task; starting a second timer stops the first, so a user has at most one running timer.
 - **FR-8** — A user adds a manual entry with date, duration in whole minutes, project, optional task, optional note, and billable flag.
 - **FR-9** — A user edits or deletes their own entries until the entry is approved; approved entries are read-only.
-- **FR-10** — A user sees a weekly timesheet of their entries by day and project, with daily and weekly totals.
+- **FR-10** — A user sees a week view of their entries by day and project, with daily and weekly totals; the week is a display affordance only and does not affect approval or storage.
 - **FR-11** — A running timer is held server-side, so it survives page reloads and shows on other devices.
+- **FR-22** — Each user has a profile time zone (IANA name), proposed from the browser on first sign-in and changeable by the user.
+- **FR-23** — Every entry stores its start instant in UTC when known, the IANA time zone and UTC offset in force when it was logged, and its local date in that zone; a later change to the profile zone does not alter existing entries.
+- **FR-24** — An entry that crosses local midnight in its time zone is split at midnight, so each resulting entry belongs to exactly one local day and month.
+- **FR-25** — Admins configure the first day of the week for the organization, default Sunday; it sets the week view and weekly report grouping.
 
 ### Subsystem: Budgets and Rates
 
@@ -119,23 +121,19 @@ Roles: Entra app roles give each user a global role of Admin or Member. Manager 
 - **FR-13** — Admins set a billable rate per user and may override it per project; a rate change applies to entries from its effective date forward and never alters approved entries.
 - **FR-14** — A project shows budget consumed and remaining, and flags when the alert threshold or budget is exceeded.
 
-### Subsystem: Timesheet Approval
+### Subsystem: Entry Approval
 
-- **FR-15** — A user submits a week for approval; submitted entries are read-only to the user until approved or rejected.
-- **FR-16** — Each project's Managers approve or reject that project's entries in a submitted week, with a comment on rejection; rejected entries return to editable.
+- **FR-15** — Entries are pending approval from creation; Managers list pending entries on their projects, filtered by user, project, and date range.
+- **FR-16** — Each project's Managers approve or reject that project's stopped entries, individually or in bulk, with a comment on rejection; rejected entries return to editable. A Manager may approve their own entries on a project they manage.
 - **FR-17** — Approved entries are locked; an Admin can reopen them, and the reopening is recorded.
-- **FR-18** — Submission, approval, rejection, and reopening are recorded in an audit trail with actor, time, and comment.
+- **FR-18** — Approval, rejection, and reopening are recorded in an audit trail with actor, time, and comment.
 
 ### Subsystem: Reports and Export
 
-- **FR-19** — Users run reports of hours, and of billable amounts where permitted, grouped by project, user, task, or day over a date range, filtered by billable flag.
+- **FR-19** — Users run reports of hours, and of billable amounts where permitted, grouped by project, user, task, day, week, or month chosen at report time, over a date range, filtered by billable flag and approval status.
 - **FR-20** — Any report exports to CSV with the same filters and totals.
 - **FR-21** — Rates and dollar amounts are visible only to Admins and to Managers of the project concerned; Members see their own hours only.
-
-### Subsystem: Everhour Import
-
-- **FR-22** — An Admin imports Everhour CSV exports (projects, users, tasks, time entries), previews counts and unmatched rows in a dry run, then commits; re-importing the same file creates no duplicates.
-- **FR-23** — Imported entries are stored approved and locked; users are matched by email to Entra users.
+- **FR-26** — Reports group days and months by each entry's local date by default, can instead bucket by one chosen reporting time zone, and include a time-of-day view of when people work in their local time.
 
 ## Acceptance Test Sketches
 
@@ -147,7 +145,8 @@ Roles: Entra app roles give each user a global role of Admin or Member. Manager 
 | FR-9 | Edit approved entry | Entry approved; user edits duration | Rejected; entry unchanged |
 | FR-16 | Reject entry | Manager rejects with comment | Entry editable by user; comment visible |
 | FR-20 | Export | Report for May by project | CSV rows and totals equal on-screen report |
-| FR-22 | Re-import | Same CSV imported twice | Second commit adds zero entries |
+| FR-23 | Time zone captured | User in America/Chicago logs a timer | Entry stores UTC start, zone, offset, local date |
+| FR-24 | Midnight split | Timer 23:00 31 May to 01:00 1 June local | Two entries, 60 minutes each, one in May and one in June |
 
 ## Technical Context
 
@@ -171,32 +170,27 @@ Stack decisions are recorded in `01-frame/concerns.md`; rationale belongs in ADR
 
 - Under about 50 users, one Entra tenant.
 - Entra app roles or group claims can carry the Admin role.
-- Everhour exports include enough fields (project, task, user email, date, duration, billable) to import.
 - Cold-start latency on the first request after idle is acceptable.
 
 ### Dependencies
 
 - Entra app registration and tenant admin consent.
-- Everhour CSV export samples for import design.
 
 ## Risks
 
 | Risk | Probability | Impact | Mitigation |
 |------|-------------|--------|------------|
 | Azure SQL auto-pause makes the first request slow | High | Med | Accept at launch; measure; spec a keep-warm option in Design |
-| Everhour export lacks needed fields | Med | High | Obtain a real export before Design of FR-22 |
+| Time zone and DST handling produces wrong day or month totals | Med | High | Store zone, offset, and local date per entry (FR-23); split at local midnight (FR-24); test month boundaries and DST |
 | Rate history complicates budgets and reports | Med | Med | Effective-dated rates (FR-13), decided in Design |
 | Scope creep toward full task management | Med | Med | Non-goals above; `scope-discipline` concern |
 
 ## Open Questions
 
-- [ ] What is Tempo's week start (Monday?) and time zone handling for entries — blocks FR-10, FR-15, ask Erik.
-- [ ] Do Managers approve their own time, or does an Admin — blocks FR-16, ask Erik.
-- [ ] Is a sample Everhour export available — blocks FR-22 design, ask Erik.
-- [ ] Should the vision's Teams/Slack reminder proposition be removed or marked deferred — vision currently lists it, ask Erik.
+- [ ] Is a hard period close (an Admin lock-through date for payroll or billing) needed in addition to per-entry approval — blocks FR-17 design, ask Erik.
 
 ## Success Criteria
 
-- Everhour is cancelled and all 24 months of history is queryable in Tempo.
-- 90% of hours are logged within 24 hours and 90% of timesheets approved within 3 working days.
+- Everhour is cancelled.
+- 90% of hours are logged within 24 hours and 90% of entries approved within 3 working days.
 - Monthly Azure cost stays under $30.

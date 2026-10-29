@@ -23,7 +23,7 @@ ddx:
 | admin-console | library | `area:ui` | Admins and Managers manage mutable domain objects (users, projects, members, rates, approvals) through the UI. | Primary operator workflow (create project, approve week) covered by whole-stack e2e | assumption (Frame selection) |
 | testing | library | all | Timer logic, rate and budget math, and approvals need a deliberate test strategy. | Unit tests for domain rules; API tests against a real database schema | operator-override |
 | verification | library | all | Evidence-based completion and a pre-merge gate. | Tests and checks pass in CI before merge | operator-override |
-| e2e-playwright (e2e-framework slot) | shipped-default | `area:ui` | Core flows: sign in, timer, timesheet submit, approval. | Playwright against a deployed preview with a test Entra identity | operator-override |
+| e2e-playwright (e2e-framework slot) | shipped-default | `area:ui` | Core flows: sign in, timer, entry approval. | Playwright against a deployed preview with a test Entra identity | operator-override |
 | modularity-and-encapsulation | library | `area:api`, `area:ui` | Handwritten TypeScript needs clear module boundaries; detailed boundaries are decided in Design. | Narrow public interfaces; boundary checks in CI | operator-override |
 | code-shape-ceilings | library | all | Keeps files and functions small and reviewable. | Size ceilings enforced by lint/CI | operator-override |
 | o11y-otel | library | `area:api`, `area:infra` | Serverless cold starts and errors are hard to see otherwise. | OpenTelemetry to Application Insights; trace each request | operator-override |
@@ -42,9 +42,8 @@ ddx:
 
 - `area:ui` — React SPA
 - `area:api` — Azure Functions endpoints
-- `area:data` — Azure SQL schema, migrations, CSV import
+- `area:data` — Azure SQL schema and migrations
 - `area:infra` — Azure resources, CI/CD, Entra app registration
-- `area:integrations` — Teams/Slack reminders, Everhour import
 
 ## Concern Conflicts
 

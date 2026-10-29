@@ -1,24 +1,24 @@
 ---
 ddx:
-  id: FEAT-007
+  id: FEAT-005
   authoring:
     home: repo
   links:
     - prd
 ---
 
-# Feature Specification: FEAT-007 — Everhour Import
+# Feature Specification: FEAT-005 — Entry Approval
 
-**Feature ID**: FEAT-007
-**Priority**: P1
+**Feature ID**: FEAT-005
+**Priority**: P0
 **Owner**: Erik LaBianca
-**Covered PRD Subsystem(s)**: Everhour Import
-**Covered PRD Requirements**: FR-22, FR-23
+**Covered PRD Subsystem(s)**: Entry Approval
+**Covered PRD Requirements**: FR-15, FR-16, FR-17, FR-18
 **Cross-Subsystem Rationale**: None — single subsystem.
 
 ## Overview
 
-One-time CSV import of Everhour history with dry run and idempotent commit. It implements the PRD subsystem of the same name.
+Entry-level approval: pending entries, per-project manager approval or rejection, locking, reopening, and audit trail. It implements the PRD subsystem of the same name.
 
 ## Ideal Future State
 
@@ -34,9 +34,10 @@ Staff and managers complete this part of their week without help or workarounds,
 
 ### Functional Requirements by Area
 
-IMP-01. Dry run reports counts and unmatched rows (FR-22).
-IMP-02. Commit is idempotent (FR-22).
-IMP-03. Imported entries approved and locked; users matched by email (FR-23).
+APPR-01. Entries are pending from creation; managers list pending entries for their projects, filtered by user, project, and date range (FR-15).
+APPR-02. Managers approve or reject stopped entries individually or in bulk, with a comment on rejection (FR-16).
+APPR-03. Approved entries lock; Admin reopens (FR-17).
+APPR-04. Audit trail of every action (FR-18).
 
 ### Non-Functional Requirements
 
@@ -47,12 +48,17 @@ IMP-03. Imported entries approved and locked; users matched by email (FR-23).
 
 ## User Stories
 
-- [US-014](../user-stories/US-014.md)
+- [US-009](../user-stories/US-009.md)
+- [US-010](../user-stories/US-010.md)
+- [US-011](../user-stories/US-011.md)
 
 ## Edge Cases and Error Handling
 
-- Unmatched user email: row reported, nothing created for it.
-- Malformed CSV: rejected with line numbers.
+- Entries on several projects: each project's managers approve only their own project's entries.
+- Entry with a running timer: not approvable until stopped.
+- The two halves of a midnight-split entry can be approved together or separately.
+- Project with no Manager: Admins approve.
+- A Manager approves their own entries; the audit trail records the actor and that it was a self-approval.
 
 ## Success Metrics
 
@@ -66,8 +72,8 @@ IMP-03. Imported entries approved and locked; users matched by email (FR-23).
 
 - **Other features**: FEAT-001 (identity)
 - **External services**: Entra ID; Azure SQL (exact interface surface lives in Contracts, Design activity)
-- **PRD requirements**: FR-22, FR-23
+- **PRD requirements**: FR-15, FR-16, FR-17, FR-18
 
 ## Out of Scope
 
-- Ongoing sync with Everhour.
+- Delegated or automatic approval; payroll integration.
