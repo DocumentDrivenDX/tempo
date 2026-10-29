@@ -12,7 +12,7 @@ kind: product
 
 ## Summary
 
-Tempo is a web app where Synaptiq staff track time against projects and tasks, project managers set budgets and approve entries, and admins report and export hours. It replaces Everhour, signs users in with Entra ID, and runs on serverless Azure for under $30 a month. v1 covers sign-in, projects and tasks, a timer and manual entry, budgets and rates, weekly approval, and reports with CSV export. Every entry records its time zone so local working hours and month ends are exact. Success is 90% of hours logged within 24 hours, Everhour cancelled within 6 months, and approvals within 3 working days.
+Tempo is a web app where Synaptiq staff track time against projects and tasks, project managers set budgets and approve entries, admins manage the system, and accountants close periods and report and export hours. It replaces Everhour, signs users in with Entra ID, and runs on serverless Azure for under $30 a month. v1 covers sign-in, projects and tasks, a timer and manual entry, budgets and rates, weekly approval, and reports with CSV export. Every entry records its time zone so local working hours and month ends are exact. Success is 90% of hours logged within 24 hours, Everhour cancelled within 6 months, and approvals within 3 working days.
 
 ## Problem and Goals
 
@@ -63,21 +63,28 @@ Deferred items tracked in `docs/helix/parking-lot.md`.
 
 ### Secondary Persona: Alex, Admin
 
-**Role**: Operations or finance administrator
-**Goals**: Manage users and projects, report hours by project and user, export for billing
-**Pain Points**: Reconciling exports across tools
+**Role**: Operations administrator
+**Goals**: Manage users, projects, rates, and settings
+**Pain Points**: Maintaining the same data in several tools
 
-Roles: Entra app roles give each user a global role of Admin or Member. Manager is a per-project membership role held by a Member, not a third global role.
+### Secondary Persona: Dana, Accountant
+
+**Role**: Finance or accounting staff
+**Goals**: Close periods so billed and paid hours are final; report and export hours and amounts for billing
+**Pain Points**: Hours that change after they have been invoiced or paid
+
+Roles: Entra app roles give each user a global role of Admin, Member, or Accountant. Manager is a per-project membership role held by a Member, not a global role.
 
 ## Requirements
 
 ### Must Have (P0)
 
-1. Entra ID sign-in with Admin and Member roles and server-side authorization.
+1. Entra ID sign-in with Admin, Member, and Accountant roles and server-side authorization.
 2. Projects, project membership, and tasks.
 3. Timer and manual time entry with editing, with the time zone recorded on every entry.
 4. Per-project manager approval of entries, with locking.
 5. Reports by project, user, and date range, with CSV export.
+6. Accounting period close, owned by the Accountant role.
 
 ### Should Have (P1)
 
@@ -94,8 +101,8 @@ Roles: Entra app roles give each user a global role of Admin or Member. Manager 
 ### Subsystem: Identity and Access
 
 - **FR-1** — Users sign in only through the company Entra ID tenant; Tempo stores no passwords.
-- **FR-2** — A user is created on first sign-in with the global role from their Entra app role (Admin or Member, default Member); Admins can deactivate users.
-- **FR-3** — Every data access is authorized server-side: Members see only projects they belong to; Admins see all.
+- **FR-2** — A user is created on first sign-in with the global role from their Entra app role (Admin, Member, or Accountant; default Member); Admins can deactivate users.
+- **FR-3** — Every data access is authorized server-side: Members see only projects they belong to; Admins and Accountants see all.
 
 ### Subsystem: Projects and Tasks
 
@@ -125,14 +132,15 @@ Roles: Entra app roles give each user a global role of Admin or Member. Manager 
 
 - **FR-15** — Entries are pending approval from creation; Managers list pending entries on their projects, filtered by user, project, and date range.
 - **FR-16** — Each project's Managers approve or reject that project's stopped entries, individually or in bulk, with a comment on rejection; rejected entries return to editable. A Manager may approve their own entries on a project they manage.
-- **FR-17** — Approved entries are locked; an Admin can reopen them, and the reopening is recorded.
+- **FR-17** — Approved entries are locked; an Admin can reopen them unless their period is closed (FR-27), and the reopening is recorded.
 - **FR-18** — Approval, rejection, and reopening are recorded in an audit trail with actor, time, and comment.
+- **FR-27** — Accountants close accounting periods by setting a close-through date and reopen them by moving it earlier; no entry with a local date on or before the date can be created, edited, deleted, approved, rejected, or reopened while closed, by any role; closing and reopening are recorded in the audit trail.
 
 ### Subsystem: Reports and Export
 
 - **FR-19** — Users run reports of hours, and of billable amounts where permitted, grouped by project, user, task, day, week, or month chosen at report time, over a date range, filtered by billable flag and approval status.
 - **FR-20** — Any report exports to CSV with the same filters and totals.
-- **FR-21** — Rates and dollar amounts are visible only to Admins and to Managers of the project concerned; Members see their own hours only.
+- **FR-21** — Rates and dollar amounts are visible only to Admins, Accountants, and Managers of the project concerned; Members see their own hours only.
 - **FR-26** — Reports group days and months by each entry's local date by default, can instead bucket by one chosen reporting time zone, and include a time-of-day view of when people work in their local time.
 
 ## Acceptance Test Sketches
@@ -146,6 +154,7 @@ Roles: Entra app roles give each user a global role of Admin or Member. Manager 
 | FR-16 | Reject entry | Manager rejects with comment | Entry editable by user; comment visible |
 | FR-20 | Export | Report for May by project | CSV rows and totals equal on-screen report |
 | FR-23 | Time zone captured | User in America/Chicago logs a timer | Entry stores UTC start, zone, offset, local date |
+| FR-27 | Closed period | Close-through 31 May; Admin edits an entry dated 30 May | Edit denied; audit trail unchanged |
 | FR-24 | Midnight split | Timer 23:00 31 May to 01:00 1 June local | Two entries, 60 minutes each, one in May and one in June |
 
 ## Technical Context
@@ -187,7 +196,8 @@ Stack decisions are recorded in `01-frame/concerns.md`; rationale belongs in ADR
 
 ## Open Questions
 
-- [ ] Is a hard period close (an Admin lock-through date for payroll or billing) needed in addition to per-entry approval — blocks FR-17 design, ask Erik.
+- [ ] When an Accountant closes a period that still has pending entries, should the close be blocked, or should pending entries be auto-approved — blocks FR-27 design, ask Erik.
+- [ ] Should an Accountant also be allowed to approve entries, or only close periods and report — blocks FR-27 and FR-16 design, ask Erik.
 
 ## Success Criteria
 

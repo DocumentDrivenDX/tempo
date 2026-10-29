@@ -18,7 +18,7 @@ ddx:
 
 ## Overview
 
-Sign-in through Entra ID with Admin and Member roles, auto-provisioning, deactivation, and server-side authorization. It implements the PRD subsystem of the same name.
+Sign-in through Entra ID with Admin, Member, and Accountant roles, auto-provisioning, deactivation, and server-side authorization. It implements the PRD subsystem of the same name.
 
 ## Ideal Future State
 
@@ -35,7 +35,7 @@ Staff and managers complete this part of their week without help or workarounds,
 ### Functional Requirements by Area
 
 AUTH-01. Sign-in uses the company Entra tenant only (FR-1).
-AUTH-02. First sign-in creates the user with role from Entra app role, default Member (FR-2).
+AUTH-02. First sign-in creates the user with role from Entra app role (Admin, Member, or Accountant), default Member (FR-2).
 AUTH-03. Admins deactivate users; deactivated users cannot sign in (FR-2).
 AUTH-04. Every API call checks role and project membership (FR-3).
 
@@ -72,4 +72,4 @@ AUTH-04. Every API call checks role and project membership (FR-3).
 
 ## Out of Scope
 
-- Roles beyond Admin and Member; guest or external users.
+- Roles beyond Admin, Member, and Accountant; guest or external users.

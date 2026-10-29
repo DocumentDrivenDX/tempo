@@ -18,7 +18,7 @@ ddx:
 | datastore: Azure SQL Database serverless (free offer) | assumption | `area:data` | Relational data (projects, tasks, time entries, rates, approvals) and aggregate reports; free offer + auto-pause fits low cost. Cosmos DB serverless and PostgreSQL Flexible Server remain alternatives for an ADR. | Migrations in repo; backups verified; tolerate cold-start resume | assumption (ADR required) |
 | scope-discipline | library | all | Replacing a commercial tool invites feature creep. | Hold v1 to named Everhour-parity features | assumption |
 | security-owasp | library | `area:api`, `area:ui` | Authenticated business data incl. billing rates. | Server-side authorization on every call | assumption |
-| authorization-model | library | `area:api` | Two roles plus per-project membership and approvals. | Central policy checks | assumption |
+| authorization-model | library | `area:api` | Admin, Member, and Accountant roles plus per-project membership, approvals, and period close. | Central policy checks | assumption |
 | auth | library | `area:api`, `area:ui` | Account-based product: sign-in, sessions, server-side RBAC through the principal (FR-1 to FR-3). Mechanism is the Entra ID filler above. | Resolve principal on every call; no hardcoded provider | assumption (Frame selection) |
 | admin-console | library | `area:ui` | Admins and Managers manage mutable domain objects (users, projects, members, rates, approvals) through the UI. | Primary operator workflow (create project, approve week) covered by whole-stack e2e | assumption (Frame selection) |
 | testing | library | all | Timer logic, rate and budget math, and approvals need a deliberate test strategy. | Unit tests for domain rules; API tests against a real database schema | operator-override |

@@ -41,7 +41,7 @@ Priya signs in with her Synaptiq Entra account, opens Tempo, picks a project and
 | Value Proposition | Customer Benefit |
 |-------------------|------------------|
 | Timer and manual entry per project and task | Hours get logged in seconds, so reports are accurate |
-| Entra ID sign-in with Admin and Member roles | No new passwords; access follows company directory |
+| Entra ID sign-in with Admin, Member, and Accountant roles | No new passwords; access follows company directory |
 | Budgets, rates, and entry approval | Managers see overruns and approve hours without spreadsheets |
 | Reports and CSV export | Billing and payroll inputs without re-keying |
 | Serverless Azure hosting | Hosting cost near zero when idle |

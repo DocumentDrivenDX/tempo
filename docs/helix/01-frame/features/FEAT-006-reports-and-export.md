@@ -36,7 +36,7 @@ Staff and managers complete this part of their week without help or workarounds,
 
 REP-01. Group by project, user, task, or day over a date range (FR-19).
 REP-02. CSV export matches on-screen totals (FR-20).
-REP-03. Rates and amounts visible only to Admins and project Managers (FR-21).
+REP-03. Rates and amounts visible only to Admins, Accountants, and project Managers of the project concerned (FR-21).
 REP-04. Day and month grouping uses each entry local date by default, with an option to report in one chosen time zone; a time-of-day view shows when people work in their local time (FR-26).
 
 ### Non-Functional Requirements

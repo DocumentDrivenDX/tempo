@@ -13,12 +13,12 @@ ddx:
 **Priority**: P0
 **Owner**: Erik LaBianca
 **Covered PRD Subsystem(s)**: Entry Approval
-**Covered PRD Requirements**: FR-15, FR-16, FR-17, FR-18
+**Covered PRD Requirements**: FR-15, FR-16, FR-17, FR-18, FR-27
 **Cross-Subsystem Rationale**: None — single subsystem.
 
 ## Overview
 
-Entry-level approval: pending entries, per-project manager approval or rejection, locking, reopening, and audit trail. It implements the PRD subsystem of the same name.
+Entry-level approval: pending entries, per-project manager approval or rejection, locking, reopening, accounting period close, and audit trail. It implements the PRD subsystem of the same name.
 
 ## Ideal Future State
 
@@ -38,6 +38,7 @@ APPR-01. Entries are pending from creation; managers list pending entries for th
 APPR-02. Managers approve or reject stopped entries individually or in bulk, with a comment on rejection (FR-16).
 APPR-03. Approved entries lock; Admin reopens (FR-17).
 APPR-04. Audit trail of every action (FR-18).
+APPR-05. Accountants close and reopen accounting periods; a closed period blocks all entry changes in it (FR-27).
 
 ### Non-Functional Requirements
 
@@ -51,12 +52,14 @@ APPR-04. Audit trail of every action (FR-18).
 - [US-009](../user-stories/US-009.md)
 - [US-010](../user-stories/US-010.md)
 - [US-011](../user-stories/US-011.md)
+- [US-017](../user-stories/US-017.md)
 
 ## Edge Cases and Error Handling
 
 - Entries on several projects: each project's managers approve only their own project's entries.
 - Entry with a running timer: not approvable until stopped.
 - The two halves of a midnight-split entry can be approved together or separately.
+- Entry in a closed period: no create, edit, delete, approve, reject, or reopen, including by Admins.
 - Project with no Manager: Admins approve.
 - A Manager approves their own entries; the audit trail records the actor and that it was a self-approval.
 
@@ -72,8 +75,8 @@ APPR-04. Audit trail of every action (FR-18).
 
 - **Other features**: FEAT-001 (identity)
 - **External services**: Entra ID; Azure SQL (exact interface surface lives in Contracts, Design activity)
-- **PRD requirements**: FR-15, FR-16, FR-17, FR-18
+- **PRD requirements**: FR-15, FR-16, FR-17, FR-18, FR-27
 
 ## Out of Scope
 
-- Delegated or automatic approval; payroll integration.
+- Delegated or automatic approval; payroll integration; per-project or per-client period close.
