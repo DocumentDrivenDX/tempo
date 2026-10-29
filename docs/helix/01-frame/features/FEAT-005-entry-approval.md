@@ -35,10 +35,10 @@ Staff and managers complete this part of their week without help or workarounds,
 ### Functional Requirements by Area
 
 APPR-01. Entries are pending from creation; managers list pending entries for their projects, filtered by user, project, and date range (FR-15).
-APPR-02. Managers approve or reject stopped entries individually or in bulk, with a comment on rejection (FR-16).
+APPR-02. Managers approve or reject stopped entries individually or in bulk, with a comment on rejection; Admins may do so for any entry; Accountants may not (FR-16).
 APPR-03. Approved entries lock; Admin reopens (FR-17).
 APPR-04. Audit trail of every action (FR-18).
-APPR-05. Accountants close and reopen accounting periods; a closed period blocks all entry changes in it (FR-27).
+APPR-05. Accountants and Admins close and reopen accounting periods, even while entries are unapproved; a closed period blocks all entry changes in it (FR-27).
 
 ### Non-Functional Requirements
 
@@ -59,7 +59,8 @@ APPR-05. Accountants close and reopen accounting periods; a closed period blocks
 - Entries on several projects: each project's managers approve only their own project's entries.
 - Entry with a running timer: not approvable until stopped.
 - The two halves of a midnight-split entry can be approved together or separately.
-- Entry in a closed period: no create, edit, delete, approve, reject, or reopen, including by Admins.
+- Entry in a closed period: no create, edit, delete, approve, reject, or reopen by any role; an Admin or Accountant must reopen the period first.
+- Unapproved entries in a period at close are locked as they are and stay unapproved.
 - Project with no Manager: Admins approve.
 - A Manager approves their own entries; the audit trail records the actor and that it was a self-approval.
 

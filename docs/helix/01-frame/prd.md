@@ -73,7 +73,7 @@ Deferred items tracked in `docs/helix/parking-lot.md`.
 **Goals**: Close periods so billed and paid hours are final; report and export hours and amounts for billing
 **Pain Points**: Hours that change after they have been invoiced or paid
 
-Roles: Entra app roles give each user a global role of Admin, Member, or Accountant. Manager is a per-project membership role held by a Member, not a global role.
+Roles: Entra app roles give each user a global role of Admin, Member, or Accountant. Manager is a per-project membership role held by a Member, not a global role. Admins can perform every operation, including approving entries and closing or reopening periods, as an override when the normal process breaks down.
 
 ## Requirements
 
@@ -131,10 +131,10 @@ Roles: Entra app roles give each user a global role of Admin, Member, or Account
 ### Subsystem: Entry Approval
 
 - **FR-15** — Entries are pending approval from creation; Managers list pending entries on their projects, filtered by user, project, and date range.
-- **FR-16** — Each project's Managers approve or reject that project's stopped entries, individually or in bulk, with a comment on rejection; rejected entries return to editable. A Manager may approve their own entries on a project they manage.
+- **FR-16** — Each project's Managers approve or reject that project's stopped entries, individually or in bulk, with a comment on rejection; rejected entries return to editable. A Manager may approve their own entries on a project they manage. Admins may approve or reject any entry as an override for process breakdown; Accountants may not approve or reject.
 - **FR-17** — Approved entries are locked; an Admin can reopen them unless their period is closed (FR-27), and the reopening is recorded.
 - **FR-18** — Approval, rejection, and reopening are recorded in an audit trail with actor, time, and comment.
-- **FR-27** — Accountants close accounting periods by setting a close-through date and reopen them by moving it earlier; no entry with a local date on or before the date can be created, edited, deleted, approved, rejected, or reopened while closed, by any role; closing and reopening are recorded in the audit trail.
+- **FR-27** — Accountants and Admins close accounting periods by setting a close-through date, even while entries in the period are unapproved, and reopen them by moving it earlier; no entry with a local date on or before the date can be created, edited, deleted, approved, rejected, or reopened while closed, by any role; unapproved entries in a closed period stay unapproved; closing and reopening are recorded in the audit trail.
 
 ### Subsystem: Reports and Export
 
@@ -192,12 +192,12 @@ Stack decisions are recorded in `01-frame/concerns.md`; rationale belongs in ADR
 | Azure SQL auto-pause makes the first request slow | High | Med | Accept at launch; measure; spec a keep-warm option in Design |
 | Time zone and DST handling produces wrong day or month totals | Med | High | Store zone, offset, and local date per entry (FR-23); split at local midnight (FR-24); test month boundaries and DST |
 | Rate history complicates budgets and reports | Med | Med | Effective-dated rates (FR-13), decided in Design |
+| Hours locked unapproved in a closed period are missed by approved-only reports | Med | Med | Approval-status filter and flag on reports (FR-19); Admin can reopen the period to approve (FR-27) |
 | Scope creep toward full task management | Med | Med | Non-goals above; `scope-discipline` concern |
 
 ## Open Questions
 
-- [ ] When an Accountant closes a period that still has pending entries, should the close be blocked, or should pending entries be auto-approved — blocks FR-27 design, ask Erik.
-- [ ] Should an Accountant also be allowed to approve entries, or only close periods and report — blocks FR-27 and FR-16 design, ask Erik.
+None at this time.
 
 ## Success Criteria
 
