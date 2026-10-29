@@ -1,0 +1,54 @@
+# Tempo table spec (UMF TableSpec). Authoritative column and relationship definitions; prose in docs/helix/02-design/data-design.md.
+version: "1.0"
+table_name: "running_timers"
+description: "At most one running timer per user, held server-side (FR-7, FR-11)."
+table_type: "data_table"
+primary_key:
+  - "user_id"
+columns:
+  - name: "user_id"
+    data_type: "VARCHAR"
+    nullable: false
+    description: "Timer owner; primary key gives one timer per user."
+    length: 36
+    key_type: "primary"
+  - name: "project_id"
+    data_type: "VARCHAR"
+    nullable: false
+    description: "Project being timed."
+    length: 36
+    key_type: "foreign_one_to_many"
+  - name: "task_id"
+    data_type: "VARCHAR"
+    nullable: true
+    description: "Optional task."
+    length: 36
+    key_type: "foreign_one_to_many"
+  - name: "started_at_utc"
+    data_type: "TIMESTAMP"
+    nullable: false
+    description: "UTC start."
+  - name: "tz_id"
+    data_type: "VARCHAR"
+    nullable: false
+    description: "IANA time zone captured at start."
+    length: 64
+  - name: "note"
+    data_type: "VARCHAR"
+    nullable: true
+    description: "Optional note."
+    length: 500
+relationships:
+  foreign_keys:
+    - column: "user_id"
+      references_table: "users"
+      references_column: "id"
+      type: "foreign_key"
+    - column: "project_id"
+      references_table: "projects"
+      references_column: "id"
+      type: "foreign_key"
+    - column: "task_id"
+      references_table: "tasks"
+      references_column: "id"
+      type: "foreign_key"

@@ -1,0 +1,72 @@
+# Tempo table spec (UMF TableSpec). Authoritative column and relationship definitions; prose in docs/helix/02-design/data-design.md.
+version: "1.0"
+table_name: "audit_log"
+description: "Append-only history of approvals, rejections, reopenings, and period closes (FR-18, ADR-007)."
+table_type: "data_table"
+primary_key:
+  - "id"
+columns:
+  - name: "id"
+    data_type: "VARCHAR"
+    nullable: false
+    description: "Primary key."
+    length: 36
+    key_type: "primary"
+  - name: "at_utc"
+    data_type: "TIMESTAMP"
+    nullable: false
+    description: "UTC time of the action."
+  - name: "actor_user_id"
+    data_type: "VARCHAR"
+    nullable: false
+    description: "Who acted."
+    length: 36
+    key_type: "foreign_one_to_many"
+  - name: "actor_role"
+    data_type: "VARCHAR"
+    nullable: false
+    description: "Actor's global role at the time."
+    length: 12
+    validations:
+      - type: "expect_column_values_to_be_in_set"
+        kwargs:
+          column: "actor_role"
+          value_set:
+            - "admin"
+            - "member"
+            - "accountant"
+  - name: "action"
+    data_type: "VARCHAR"
+    nullable: false
+    description: "Action name; Admin overrides end in .override."
+    length: 64
+    sample_values:
+      - "entry.approve"
+      - "period.close"
+  - name: "entity_type"
+    data_type: "VARCHAR"
+    nullable: false
+    description: "Kind of entity affected."
+    length: 32
+    sample_values:
+      - "time_entry"
+  - name: "entity_id"
+    data_type: "VARCHAR"
+    nullable: false
+    description: "Affected entity id."
+    length: 36
+  - name: "detail"
+    data_type: "TEXT"
+    nullable: true
+    description: "JSON detail of the change."
+  - name: "comment"
+    data_type: "VARCHAR"
+    nullable: true
+    description: "Reason or rejection comment."
+    length: 1000
+relationships:
+  foreign_keys:
+    - column: "actor_user_id"
+      references_table: "users"
+      references_column: "id"
+      type: "foreign_key"

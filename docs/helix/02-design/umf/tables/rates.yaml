@@ -1,0 +1,51 @@
+# Tempo table spec (UMF TableSpec). Authoritative column and relationship definitions; prose in docs/helix/02-design/data-design.md.
+version: "1.0"
+table_name: "rates"
+description: "Effective-dated billable rates, per user with optional per-project override (FR-13)."
+table_type: "data_table"
+primary_key:
+  - "id"
+columns:
+  - name: "id"
+    data_type: "VARCHAR"
+    nullable: false
+    description: "Primary key."
+    length: 36
+    key_type: "primary"
+  - name: "user_id"
+    data_type: "VARCHAR"
+    nullable: false
+    description: "Rate owner."
+    length: 36
+    key_type: "foreign_one_to_many"
+  - name: "project_id"
+    data_type: "VARCHAR"
+    nullable: true
+    description: "Project override; null is the user's default rate."
+    length: 36
+    key_type: "foreign_one_to_many"
+  - name: "rate_minor"
+    data_type: "DECIMAL"
+    nullable: false
+    description: "Hourly rate in minor units."
+    precision: 18
+    scale: 0
+    validations:
+      - type: "expect_column_values_to_be_between"
+        kwargs:
+          column: "rate_minor"
+          min_value: 0
+  - name: "effective_from"
+    data_type: "DATE"
+    nullable: false
+    description: "First local date the rate applies to."
+relationships:
+  foreign_keys:
+    - column: "user_id"
+      references_table: "users"
+      references_column: "id"
+      type: "foreign_key"
+    - column: "project_id"
+      references_table: "projects"
+      references_column: "id"
+      type: "foreign_key"

@@ -1,0 +1,40 @@
+# Tempo table spec (UMF TableSpec). Authoritative column and relationship definitions; prose in docs/helix/02-design/data-design.md.
+version: "1.0"
+table_name: "settings"
+description: "Organization singleton: week start, period close, currency (FR-25, FR-27, ADR-006)."
+table_type: "configuration"
+primary_key:
+  - "id"
+columns:
+  - name: "id"
+    data_type: "INTEGER"
+    nullable: false
+    description: "Always 1."
+    key_type: "primary"
+    validations:
+      - type: "expect_column_values_to_be_between"
+        kwargs:
+          column: "id"
+          min_value: 1
+          max_value: 1
+  - name: "week_start"
+    data_type: "INTEGER"
+    nullable: false
+    description: "First day of week, 0=Sunday to 6=Saturday."
+    validations:
+      - type: "expect_column_values_to_be_between"
+        kwargs:
+          column: "week_start"
+          min_value: 0
+          max_value: 6
+  - name: "closed_through"
+    data_type: "DATE"
+    nullable: true
+    description: "Entries with local_date on or before this date are locked; null means no close."
+  - name: "currency"
+    data_type: "CHAR"
+    nullable: false
+    description: "ISO currency code."
+    length: 3
+    sample_values:
+      - "USD"

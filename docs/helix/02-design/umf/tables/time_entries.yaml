@@ -1,0 +1,132 @@
+# Tempo table spec (UMF TableSpec). Authoritative column and relationship definitions; prose in docs/helix/02-design/data-design.md.
+version: "1.0"
+table_name: "time_entries"
+description: "Logged time. Each row stores its start instant, time zone, offset, and local date (FR-8, FR-23, ADR-005)."
+table_type: "data_table"
+primary_key:
+  - "id"
+columns:
+  - name: "id"
+    data_type: "VARCHAR"
+    nullable: false
+    description: "Primary key."
+    length: 36
+    key_type: "primary"
+  - name: "user_id"
+    data_type: "VARCHAR"
+    nullable: false
+    description: "Who worked."
+    length: 36
+    key_type: "foreign_one_to_many"
+  - name: "project_id"
+    data_type: "VARCHAR"
+    nullable: false
+    description: "Project worked on."
+    length: 36
+    key_type: "foreign_one_to_many"
+  - name: "task_id"
+    data_type: "VARCHAR"
+    nullable: true
+    description: "Optional task."
+    length: 36
+    key_type: "foreign_one_to_many"
+  - name: "started_at_utc"
+    data_type: "TIMESTAMP"
+    nullable: true
+    description: "UTC start; null for manual entries with no start time (FR-23)."
+  - name: "ended_at_utc"
+    data_type: "TIMESTAMP"
+    nullable: true
+    description: "UTC end; null when start is null."
+  - name: "duration_minutes"
+    data_type: "INTEGER"
+    nullable: false
+    description: "Whole minutes, at least 1."
+    validations:
+      - type: "expect_column_values_to_be_between"
+        kwargs:
+          column: "duration_minutes"
+          min_value: 1
+          max_value: 1440
+  - name: "tz_id"
+    data_type: "VARCHAR"
+    nullable: false
+    description: "IANA time zone in force when logged (FR-23)."
+    length: 64
+    sample_values:
+      - "America/Chicago"
+  - name: "utc_offset_minutes"
+    data_type: "INTEGER"
+    nullable: false
+    description: "UTC offset in minutes at the start (FR-23)."
+    validations:
+      - type: "expect_column_values_to_be_between"
+        kwargs:
+          column: "utc_offset_minutes"
+          min_value: -840
+          max_value: 840
+  - name: "local_date"
+    data_type: "DATE"
+    nullable: false
+    description: "Entry date in tz_id; fixed at write time. Drives day, month, and period close (FR-24, FR-27)."
+  - name: "billable"
+    data_type: "BOOLEAN"
+    nullable: false
+    description: "Billable flag."
+  - name: "note"
+    data_type: "VARCHAR"
+    nullable: true
+    description: "Free-text note."
+    length: 500
+  - name: "status"
+    data_type: "VARCHAR"
+    nullable: false
+    description: "Approval status (FR-15, FR-16)."
+    length: 10
+    validations:
+      - type: "expect_column_values_to_be_in_set"
+        kwargs:
+          column: "status"
+          value_set:
+            - "pending"
+            - "approved"
+            - "rejected"
+  - name: "approved_by"
+    data_type: "VARCHAR"
+    nullable: true
+    description: "Approver user; set when approved."
+    length: 36
+    key_type: "foreign_one_to_many"
+  - name: "approved_at"
+    data_type: "TIMESTAMP"
+    nullable: true
+    description: "UTC approval time."
+  - name: "rate_minor_snapshot"
+    data_type: "DECIMAL"
+    nullable: true
+    description: "Billable rate frozen at approval, in minor units (FR-13)."
+    precision: 18
+    scale: 0
+  - name: "split_group_id"
+    data_type: "VARCHAR"
+    nullable: true
+    description: "Shared by the segments of one midnight-split entry (FR-24)."
+    length: 36
+relationships:
+  foreign_keys:
+    - column: "user_id"
+      references_table: "users"
+      references_column: "id"
+      type: "foreign_key"
+    - column: "project_id"
+      references_table: "projects"
+      references_column: "id"
+      type: "foreign_key"
+    - column: "task_id"
+      references_table: "tasks"
+      references_column: "id"
+      type: "foreign_key"
+    - column: "approved_by"
+      references_table: "users"
+      references_column: "id"
+      type: "foreign_key"

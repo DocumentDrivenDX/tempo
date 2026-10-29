@@ -12,7 +12,7 @@ It is published as an example of how a person can use HELIX to go from a one-par
 |----------|-----------|-------|
 | Discover | Research note on prior art and Azure options; product vision | [`docs/helix/00-discover/`](docs/helix/00-discover) |
 | Frame | PRD (27 numbered requirements), 6 feature specs, 17 user stories with given/when/then criteria, parking lot, project concerns | [`docs/helix/01-frame/`](docs/helix/01-frame), [`docs/helix/parking-lot.md`](docs/helix/parking-lot.md) |
-| Design | 7 ADRs, architecture with module boundaries, data design, security architecture, HTTP API contract, one technical spike plan | [`docs/helix/02-design/`](docs/helix/02-design) |
+| Design | 7 ADRs, architecture with module boundaries, data design, security architecture, HTTP API contract, UMF table specs (YAML) with a schema browser build, one technical spike plan | [`docs/helix/02-design/`](docs/helix/02-design) |
 
 The project marker is [`.helix.yml`](.helix.yml). It tells HELIX which flow governs the repo and where its documents live.
 

@@ -15,8 +15,36 @@ ddx:
 ## Data Summary
 
 - Scope: all Tempo data for FR-1 to FR-27.
-- Storage systems: Azure SQL Database serverless.
+- Storage systems: Azure SQL Database serverless. Machine-readable table specs: `umf/tables/*.yaml`.
 - Main concerns: exact local-date totals, closed-period integrity, audit tamper resistance, cost at idle.
+
+## UMF Specs and Schema Browser
+
+The table and relationship definitions are also published as UMF TableSpec files, one YAML file per table, in [`umf/tables/`](umf/tables). Each file declares the columns (type, length, nullability, key type, enum and range validations), the primary key, unique constraints, and the foreign-key relationships. The tables below are the prose view; when they disagree with the YAML, fix whichever is wrong and keep them identical.
+
+| Table | UMF spec |
+|-------|----------|
+| `users` | [umf/tables/users.yaml](umf/tables/users.yaml) |
+| `projects` | [umf/tables/projects.yaml](umf/tables/projects.yaml) |
+| `project_members` | [umf/tables/project_members.yaml](umf/tables/project_members.yaml) |
+| `tasks` | [umf/tables/tasks.yaml](umf/tables/tasks.yaml) |
+| `time_entries` | [umf/tables/time_entries.yaml](umf/tables/time_entries.yaml) |
+| `running_timers` | [umf/tables/running_timers.yaml](umf/tables/running_timers.yaml) |
+| `rates` | [umf/tables/rates.yaml](umf/tables/rates.yaml) |
+| `settings` | [umf/tables/settings.yaml](umf/tables/settings.yaml) |
+| `audit_log` | [umf/tables/audit_log.yaml](umf/tables/audit_log.yaml) |
+
+The specs were checked with the upstream [UMF](https://github.com/DocumentDrivenDX/umf) TableSpec importer: all nine import as valid and re-export byte-for-byte. That check proves the structure, not the semantics (the browser shows "semantics not validated"). Database-only rules (the period-close trigger, the audit permissions, the `local_date` consistency check) are not expressible in a TableSpec and stay in this document and ADR-005, ADR-006 and ADR-007.
+
+To browse the schema, build and serve the upstream UMF schema browser (`@documentdrivendx/umf-schema-browser`, pinned to 2.0.0):
+
+```bash
+node docs/helix/02-design/umf/build-browser.mjs
+python3 -m http.server -d docs/helix/02-design/umf/browser 8099
+# open http://localhost:8099/assets/index.html
+```
+
+The build output (about 18 MB) is git-ignored.
 
 ## Entities and Stores
 

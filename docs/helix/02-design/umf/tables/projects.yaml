@@ -1,0 +1,64 @@
+# Tempo table spec (UMF TableSpec). Authoritative column and relationship definitions; prose in docs/helix/02-design/data-design.md.
+version: "1.0"
+table_name: "projects"
+description: "Units of time, budget, and approval (FR-4, FR-12)."
+table_type: "data_table"
+primary_key:
+  - "id"
+columns:
+  - name: "id"
+    data_type: "VARCHAR"
+    nullable: false
+    description: "Primary key."
+    length: 36
+    key_type: "primary"
+  - name: "name"
+    data_type: "VARCHAR"
+    nullable: false
+    description: "Project name."
+    length: 200
+    sample_values:
+      - "Acme migration"
+  - name: "client"
+    data_type: "VARCHAR"
+    nullable: true
+    description: "Client name."
+    length: 200
+  - name: "billable_default"
+    data_type: "BOOLEAN"
+    nullable: false
+    description: "Default billable flag for new entries."
+  - name: "hours_budget_minutes"
+    data_type: "INTEGER"
+    nullable: true
+    description: "Optional hours budget in minutes (FR-12)."
+    validations:
+      - type: "expect_column_values_to_be_between"
+        kwargs:
+          column: "hours_budget_minutes"
+          min_value: 1
+  - name: "amount_budget_minor"
+    data_type: "DECIMAL"
+    nullable: true
+    description: "Optional dollar budget in minor units (FR-12)."
+    precision: 18
+    scale: 0
+    validations:
+      - type: "expect_column_values_to_be_between"
+        kwargs:
+          column: "amount_budget_minor"
+          min_value: 1
+  - name: "alert_threshold_pct"
+    data_type: "INTEGER"
+    nullable: true
+    description: "Budget alert threshold percentage, 1 to 100 (FR-12)."
+    validations:
+      - type: "expect_column_values_to_be_between"
+        kwargs:
+          column: "alert_threshold_pct"
+          min_value: 1
+          max_value: 100
+  - name: "archived"
+    data_type: "BOOLEAN"
+    nullable: false
+    description: "Archived projects accept no new time (FR-4)."

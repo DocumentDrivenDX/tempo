@@ -1,0 +1,68 @@
+# Tempo table spec (UMF TableSpec). Authoritative column and relationship definitions; prose in docs/helix/02-design/data-design.md.
+version: "1.0"
+table_name: "users"
+description: "People known to Tempo, created on first sign-in (FR-2). Global role is cached from the Entra app role (ADR-004)."
+table_type: "data_table"
+primary_key:
+  - "id"
+columns:
+  - name: "id"
+    data_type: "VARCHAR"
+    nullable: false
+    description: "Primary key. Tempo user id."
+    length: 36
+    key_type: "primary"
+  - name: "entra_oid"
+    data_type: "VARCHAR"
+    nullable: false
+    description: "Entra object id of the user; unique."
+    length: 36
+    key_type: "unique"
+  - name: "email"
+    data_type: "VARCHAR"
+    nullable: false
+    description: "Work email address; unique."
+    length: 320
+    sample_values:
+      - "priya@synaptiq.ai"
+    key_type: "unique"
+  - name: "display_name"
+    data_type: "VARCHAR"
+    nullable: false
+    description: "Display name from Entra."
+    length: 200
+    sample_values:
+      - "Priya Shah"
+  - name: "role"
+    data_type: "VARCHAR"
+    nullable: false
+    description: "Global role from the Entra app role (FR-2)."
+    length: 12
+    validations:
+      - type: "expect_column_values_to_be_in_set"
+        kwargs:
+          column: "role"
+          value_set:
+            - "admin"
+            - "member"
+            - "accountant"
+  - name: "tz_id"
+    data_type: "VARCHAR"
+    nullable: false
+    description: "Profile IANA time zone, default for new entries (FR-22)."
+    length: 64
+    sample_values:
+      - "America/Chicago"
+  - name: "active"
+    data_type: "BOOLEAN"
+    nullable: false
+    description: "False once an Admin deactivates the user (FR-2)."
+  - name: "created_at"
+    data_type: "TIMESTAMP"
+    nullable: false
+    description: "UTC time the user was first seen."
+unique_constraints:
+  -
+    - "entra_oid"
+  -
+    - "email"

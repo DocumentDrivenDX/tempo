@@ -1,0 +1,43 @@
+# Tempo table spec (UMF TableSpec). Authoritative column and relationship definitions; prose in docs/helix/02-design/data-design.md.
+version: "1.0"
+table_name: "project_members"
+description: "Project membership with a per-project role (FR-5)."
+table_type: "data_table"
+primary_key:
+  - "project_id"
+  - "user_id"
+columns:
+  - name: "project_id"
+    data_type: "VARCHAR"
+    nullable: false
+    description: "Project."
+    length: 36
+    key_type: "foreign_one_to_many"
+  - name: "user_id"
+    data_type: "VARCHAR"
+    nullable: false
+    description: "Member user."
+    length: 36
+    key_type: "foreign_one_to_many"
+  - name: "project_role"
+    data_type: "VARCHAR"
+    nullable: false
+    description: "Per-project role."
+    length: 12
+    validations:
+      - type: "expect_column_values_to_be_in_set"
+        kwargs:
+          column: "project_role"
+          value_set:
+            - "manager"
+            - "contributor"
+relationships:
+  foreign_keys:
+    - column: "project_id"
+      references_table: "projects"
+      references_column: "id"
+      type: "foreign_key"
+    - column: "user_id"
+      references_table: "users"
+      references_column: "id"
+      type: "foreign_key"
