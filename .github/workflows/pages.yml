@@ -10,12 +10,14 @@ permissions:
   id-token: write
 concurrency:
   group: pages
-  cancel-in-progress: true
+  # Never cancel a deploy mid-flight; a newer push just replaces the queued run.
+  cancel-in-progress: false
 env:
   DOCUMENTOR: "git+https://github.com/DocumentDrivenDX/helix@v0.19.1#subdirectory=tools/documentor"
 jobs:
   build:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
       - uses: astral-sh/setup-uv@v6
@@ -32,6 +34,7 @@ jobs:
   deploy:
     needs: build
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}

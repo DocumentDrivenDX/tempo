@@ -15,7 +15,7 @@
 <!-- helix:source docs/helix/01-frame/concerns.md sha256:4dc343af76d6770a -->
 <!-- helix:source docs/helix/02-design/data-design.md sha256:4e13adc8da5cf9ab -->
 <!-- helix:source docs/helix/02-design/security-architecture.md sha256:ec6ec158b7ee3f75 -->
-<!-- helix:source .github/workflows/pages.yml sha256:2e645bcab9d4bae5 -->
+<!-- helix:source .github/workflows/pages.yml sha256:4752c996a93a13b0 -->
 # Architecture
 
 ## Context
